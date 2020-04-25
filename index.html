@@ -88,7 +88,7 @@
 					"lucio", "mccree", "mei", "mercy", "moira", "orisa", "pharah", "reaper", "reinhardt", "roadhog", "sigma", "soldier76",
 					"sombra", "symmetra", "torbjorn", "tracer", "widowmaker", "winston", "wrecking_ball", "zarya", "zenyatta"]
 				for (let name of names) {
-					heroes.push(fetch(`${window.location.origin}/ow/${name}.json`))
+					heroes.push(fetch(`${window.location.href}/ow/${name}.json`))
 				}
 				heroes = await Promise.all(heroes)
 				heroes = await Promise.all(heroes.map(h => h.json()))	// fix this double wait later?
