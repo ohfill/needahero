@@ -1,0 +1,106 @@
+<html lang="en">
+	<head>
+		<title>I need a hero</title>
+		<meta charset="UTF-8">
+		<style>
+			.filterable {
+				float: left;
+				background-color: #2196F3;
+				color: #ffffff;
+				text-align: center;
+				margin: 1em;
+				padding: .5em;
+				display: none;
+			}
+			.show {
+				display: block;
+			}
+			ul {
+				list-style-type: none;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>You need a hero...</h1>	
+		<div id="filters">
+			<div>
+				<span>general</span>
+				<button onclick="doFilter(undefined, undefined)">All</button>	<!-- neat little hack to show all -->
+			</div>
+		</div>
+		<div id="heroes">
+
+		</div>
+		<script>
+			function createCard(hero) {
+				let h = document.createElement("div")
+				h.id = hero.name
+				h.classList.add("filterable")
+				let l = document.createElement("ul")
+				for (let v of Object.keys(hero)) {
+					let a = document.createElement("li")
+					a.innerText = `${v}: ${hero[v]}`
+					l.appendChild(a)
+				}
+				h.appendChild(l)
+				return h
+			}
+			const filters = {
+				role: ["tank", "dps", "support"],
+				weapon_type: ["hitscan", "melee", "projectile", "aoe"],
+				effective_range: ["long", "medium", "close", "melee"],
+				mobility: ["high", "medium", "low"],
+				ease_of_value: ["hard", "medium", "easy"],
+			}
+			function makeFilters() {
+				const filterDiv = document.getElementById("filters")
+				for (let section of Object.keys(filters)) {
+					let div = document.createElement("div")
+					div.id = section
+					let title = document.createElement("span")
+					title.innerText = section
+					div.appendChild(title)
+					for (let val of filters[section]) {
+						let button = document.createElement("button")
+						button.innerText = val
+						button.onclick = () => doFilter(section, val)
+						div.appendChild(button)
+					}
+					filterDiv.appendChild(div)
+				}
+			}
+			function doFilter(section, value) {
+				let visible = heroes.filter(h => {
+					return h[section] === value
+				})
+				for (let hero of heroes) {
+					let h = document.getElementById(hero.name)
+					if (visible.find(hr => hr.name === hero.name)) {
+						h.classList.add("show")
+					} else {
+						h.classList.remove("show")
+					}
+				}
+			}
+			var heroes = [];
+			(async function() {
+				const names = ["ashe", "ana", "baptiste", "bastion", "brigitte", "doomfist", "dva", "echo", "genji", "hanzo", "junkrat",
+					"lucio", "mccree", "mei", "mercy", "moira", "orisa", "pharah", "reaper", "reinhardt", "roadhog", "sigma", "soldier76",
+					"sombra", "symmetra", "torbjorn", "tracer", "widowmaker", "winston", "wrecking_ball", "zarya", "zenyatta"]
+				for (let name of names) {
+					heroes.push(fetch(`${window.location.origin}/ow/${name}.json`))
+				}
+				heroes = await Promise.all(heroes)
+				heroes = await Promise.all(heroes.map(h => h.json()))	// fix this double wait later?
+				console.log(heroes)
+				for (let hero of heroes) {
+					document.getElementById("heroes").appendChild(createCard(hero))
+				}
+
+
+				makeFilters()
+				doFilter(undefined, undefined)
+			})()
+		</script>
+	</body>
+<html>
